@@ -29,28 +29,26 @@ public class SellerLoginServlet extends HttpServlet {
         try {
             User user = userService.login(UserRole.SELLER, uName, pWord, req.getSession());
             if (user != null) {
-                RequestDispatcher rd = req.getRequestDispatcher("SellerHome.html");
-
-                rd.include(req, res);
-                pw.println("    <div id=\"topmid\"><h1>Welcome to Online <br>Book Store</h1></div>\r\n"
-                        + "    <br>\r\n"
-                        + "    <table class=\"tab\">\r\n"
-                        + "        <tr>\r\n"
-                        + "            <td><p>Welcome "+user.getFirstName()+", Happy Learning !!</p></td>\r\n"
-                        + "        </tr>\r\n"
-                        + "    </table>");
+                pw.println("<!DOCTYPE html>");
+                pw.println("<html><body>");
+                pw.println("<h2>Welcome " + user.getFirstName() + "!</h2>");
+                pw.println("<p>Seller login successful.</p>");
+                pw.println("</body></html>");
             } else {
-
-                RequestDispatcher rd = req.getRequestDispatcher("SellerLogin.html");
-                rd.include(req, res);
-                pw.println("<div class=\"tab\">Incorrect UserName or PassWord</div>");
+                pw.println("<!DOCTYPE html>");
+                pw.println("<html><body>");
+                pw.println("<h2>Login failed</h2>");
+                pw.println("<p>Incorrect username or password.</p>");
+                pw.println("</body></html>");
             }
 
         } catch (StoreException e) {
             e.printStackTrace();
-            RequestDispatcher rd = req.getRequestDispatcher("SellerLogin.html");
-            rd.include(req, res);
-            pw.println("<div class=\"tab\">" + e.getMessage() + "</div>");
+            pw.println("<!DOCTYPE html>");
+            pw.println("<html><body>");
+            pw.println("<h2>Login error</h2>");
+            pw.println("<p>" + e.getMessage() + "</p>");
+            pw.println("</body></html>");
         }
     }
 }

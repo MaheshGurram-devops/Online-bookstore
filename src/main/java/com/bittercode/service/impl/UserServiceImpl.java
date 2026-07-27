@@ -37,9 +37,9 @@ public class UserServiceImpl implements UserService {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         user = new User();
-                        user.setFirstName(rs.getString("firstName"));
-                        user.setLastName(rs.getString("lastName"));
-                        user.setPhone(rs.getLong("phone"));
+                        user.setFirstName(rs.getString(UsersDBConstants.COLUMN_FIRSTNAME));
+                        user.setLastName(rs.getString(UsersDBConstants.COLUMN_LASTNAME));
+                        user.setPhone(rs.getLong(UsersDBConstants.COLUMN_PHONE));
                         user.setEmailId(email);
                         user.setPassword(password);
                         session.setAttribute(role.toString(), user.getEmailId());
@@ -49,7 +49,8 @@ public class UserServiceImpl implements UserService {
         } catch (StoreException e) {
             throw e;
         } catch (SQLException e) {
-            throw new StoreException(500, "DATABASE_QUERY_FAILURE", "Unable to validate login credentials");
+            throw new StoreException(500, "DATABASE_QUERY_FAILURE",
+                    "Unable to validate login credentials. Please verify that the database server is running and reachable.");
         }
         return user;
     }
