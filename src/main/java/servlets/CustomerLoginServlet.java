@@ -46,6 +46,7 @@ public class CustomerLoginServlet extends HttpServlet {
 
         } catch (StoreException e) {
             e.printStackTrace();
+            System.err.println("[CustomerLoginServlet] login failed: " + e.getMessage());
             pw.println("<!DOCTYPE html>");
             pw.println("<html><body>");
             pw.println("<h2>Login error</h2>");
