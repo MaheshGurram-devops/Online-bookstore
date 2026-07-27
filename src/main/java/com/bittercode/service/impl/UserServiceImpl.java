@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import com.bittercode.constant.ResponseCode;
 import com.bittercode.constant.db.UsersDBConstants;
@@ -26,27 +26,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(UserRole role, String email, String password, HttpSession session) throws StoreException {
-        Connection con = DBUtil.getConnection();
-        PreparedStatement ps;
         User user = null;
         try {
+            Connection con = DBUtil.getConnection();
             String userType = UserRole.SELLER.equals(role) ? "1" : "2";
-            ps = con.prepareStatement(loginUserQuery);
-            ps.setString(1, email);
-            ps.setString(2, password);
-            ps.setString(3, userType);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                user = new User();
-                user.setFirstName(rs.getString("firstName"));
-                user.setLastName(rs.getString("lastName"));
-                user.setPhone(rs.getLong("phone"));
-                user.setEmailId(email);
-                user.setPassword(password);
-                session.setAttribute(role.toString(), user.getEmailId());
+            try (PreparedStatement ps = con.prepareStatement(loginUserQuery)) {
+                ps.setString(1, email);
+                ps.setString(2, password);
+                ps.setString(3, userType);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        user = new User();
+                        user.setFirstName(rs.getString("firstName"));
+                        user.setLastName(rs.getString("lastName"));
+                        user.setPhone(rs.getLong("phone"));
+                        user.setEmailId(email);
+                        user.setPassword(password);
+                        session.setAttribute(role.toString(), user.getEmailId());
+                    }
+                }
             }
+        } catch (StoreException e) {
+            throw e;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new StoreException(500, "DATABASE_QUERY_FAILURE", "Unable to validate login credentials");
         }
         return user;
     }

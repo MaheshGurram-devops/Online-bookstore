@@ -3,14 +3,15 @@ package servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.bittercode.constant.BookStoreConstants;
 import com.bittercode.constant.db.UsersDBConstants;
+import com.bittercode.model.StoreException;
 import com.bittercode.model.User;
 import com.bittercode.model.UserRole;
 import com.bittercode.service.UserService;
@@ -45,8 +46,11 @@ public class SellerLoginServlet extends HttpServlet {
                 pw.println("<div class=\"tab\">Incorrect UserName or PassWord</div>");
             }
 
-        } catch (Exception e) {
+        } catch (StoreException e) {
             e.printStackTrace();
+            RequestDispatcher rd = req.getRequestDispatcher("SellerLogin.html");
+            rd.include(req, res);
+            pw.println("<div class=\"tab\">" + e.getMessage() + "</div>");
         }
     }
 }
