@@ -36,8 +36,8 @@ pipeline {
                 echo 'Deploy the application'
               sh '''
                     echo "Deploying the application..."
-                    	sudo cp -rf target/onlinebookstore.war /opt/tomcat/webapps/
-			ls -l /opt/tomcat/webapps/
+                    sudo cp -rf target/onlinebookstore.war /opt/tomcat/webapps/
+			        sudo ls -l /opt/tomcat/webapps/
 			sleep 10
 			
                 '''
