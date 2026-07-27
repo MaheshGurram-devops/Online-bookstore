@@ -13,7 +13,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/umamahesh-V1']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/MaheshGurram-devops/Java_online_bookstore.git',
+                        url: 'https://github.com/MaheshGurram-devops/Online-bookstore.git',
                         credentialsId: 'Github-credentials-Uma'
                     ]]
                 ])
