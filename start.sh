@@ -29,4 +29,4 @@ if [ ! -f "$INIT_MARKER" ]; then
     touch "$INIT_MARKER"
 fi
 
-exec /usr/share/tomcat9/bin/catalina.sh run
+exec /usr/share/tomcat10/bin/catalina.sh run
