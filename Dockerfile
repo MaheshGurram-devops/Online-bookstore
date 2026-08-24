@@ -2,25 +2,20 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Java, Tomcat and MySQL
-RUN apt-get update && \
-    apt-get install -y \
-    openjdk-17-jdk \
-    tomcat9 \
-    mysql-server \
-    && apt-get clean
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        openjdk-17-jre-headless \
+        tomcat9 \
+        mysql-server \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy WAR file to Tomcat
 COPY target/onlinebookstore.war /var/lib/tomcat9/webapps/ROOT.war
 
-# Copy database initialization script
-COPY init.sql /docker-entrypoint-initdb.d/init.sql
+COPY init.sql /init.sql
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod 755 /usr/local/bin/start.sh
 
-# Initialize MySQL and create database
-RUN service mysql start && \
-    mysql < /docker-entrypoint-initdb.d/init.sql
+EXPOSE 8080
 
-EXPOSE 8080 3306
-
-# Start MySQL and Tomcat
-CMD service mysql start && catalina.sh run
+CMD ["/usr/local/bin/start.sh"]

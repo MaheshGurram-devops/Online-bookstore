@@ -4,6 +4,9 @@ pipeline {
 	}
     environment {
         MAVEN_OPTS = '-Xmx1024m'
+        DOCKER_IMAGE = 'onlinebookstore:latest'
+        DOCKER_CONTAINER = 'onlinebookstore'
+        APPLICATION_PORT = '8086'
     }
     stages {
         stage('Sourcecode checkout') {
@@ -36,23 +39,21 @@ pipeline {
                 echo 'Build and run the Docker container'
                 sh '''
                     set -e
-                    IMAGE_NAME=onlinebookstore:latest
-                    CONTAINER_NAME=onlinebookstore
 
                     echo "Building Docker image..."
-                    sudo docker build -t "$IMAGE_NAME" .
+                    sudo docker build -t "$DOCKER_IMAGE" .
 
                     echo "Replacing existing container if present..."
-                    sudo docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+                    sudo docker rm -f "$DOCKER_CONTAINER" 2>/dev/null || true
 
-                    echo "Starting application on port 8086..."
+                    echo "Starting application on port $APPLICATION_PORT..."
                     sudo docker run -d \\
-                        --name "$CONTAINER_NAME" \\
+                        --name "$DOCKER_CONTAINER" \\
                         --restart unless-stopped \\
-                        -p 8086:8080 \\
-                        "$IMAGE_NAME"
+                        -p "$APPLICATION_PORT:8080" \\
+                        "$DOCKER_IMAGE"
 
-                    sudo docker ps --filter "name=$CONTAINER_NAME"
+                    sudo docker ps --filter "name=$DOCKER_CONTAINER"
                 '''
             }
         }
