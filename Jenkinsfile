@@ -33,13 +33,26 @@ pipeline {
         }
         stage ('Deployment') {
             steps {
-                echo 'Deploy the application'
-              sh '''
-                    echo "Deploying the application..."
-                    sudo cp -rf target/onlinebookstore.war /opt/tomcat/webapps/
-			        sudo ls -l /opt/tomcat/webapps/
-			sleep 10
-			
+                echo 'Build and run the Docker container'
+                sh '''
+                    set -e
+                    IMAGE_NAME=onlinebookstore:latest
+                    CONTAINER_NAME=onlinebookstore
+
+                    echo "Building Docker image..."
+                    sudo docker build -t "$IMAGE_NAME" .
+
+                    echo "Replacing existing container if present..."
+                    sudo docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+
+                    echo "Starting application on port 8086..."
+                    sudo docker run -d \\
+                        --name "$CONTAINER_NAME" \\
+                        --restart unless-stopped \\
+                        -p 8086:8080 \\
+                        "$IMAGE_NAME"
+
+                    sudo docker ps --filter "name=$CONTAINER_NAME"
                 '''
             }
         }
