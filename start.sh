@@ -3,6 +3,8 @@ set -eu
 
 MYSQL_DATA=/var/lib/mysql
 INIT_MARKER="$MYSQL_DATA/.onlinebookstore_initialized"
+PASSWORD_MARKER="$MYSQL_DATA/.onlinebookstore_root_password_set"
+MYSQL_PASSWORD=mysql
 
 if [ ! -d "$MYSQL_DATA/mysql" ]; then
     mysqld --initialize-insecure --user=mysql --datadir="$MYSQL_DATA"
@@ -24,8 +26,14 @@ if [ "$MYSQL_READY" -ne 1 ]; then
     exit 1
 fi
 
+if [ ! -f "$PASSWORD_MARKER" ]; then
+    mysql --protocol=socket -uroot --skip-password \
+        -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+    touch "$PASSWORD_MARKER"
+fi
+
 if [ ! -f "$INIT_MARKER" ]; then
-    mysql --protocol=socket < /init.sql
+    mysql --protocol=socket -uroot -p"$MYSQL_PASSWORD" < /init.sql
     touch "$INIT_MARKER"
 fi
 
