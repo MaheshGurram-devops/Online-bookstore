@@ -3,7 +3,7 @@ pipeline {
 		label 'linux-2108'
 	}
     environment {
-        MAVEN_OPTS = '-Xmx1024m'
+        MAVEN_OPTS = '-Xmx512m -XX:MaxMetaspaceSize=128m'
         DOCKER_IMAGE = 'onlinebookstore:latest'
         DOCKER_CONTAINER = 'onlinebookstore'
         APPLICATION_PORT = '8086'
@@ -43,8 +43,11 @@ pipeline {
                     echo "Building Docker image..."
                     sudo docker build -t "$DOCKER_IMAGE" .
 
-                    echo "Replacing existing container if present..."
-                    sudo docker rm -f "$DOCKER_CONTAINER" 2>/dev/null || true
+                    echo "Stopping and removing existing application containers..."
+                    EXISTING_CONTAINERS=$(sudo docker container ls -aq --filter "name=^/${DOCKER_CONTAINER}$")
+                    if [ -n "$EXISTING_CONTAINERS" ]; then
+                        sudo docker container rm --force $EXISTING_CONTAINERS
+                    fi
 
                     echo "Starting application on port $APPLICATION_PORT..."
                     sudo docker run -d \\
@@ -54,6 +57,9 @@ pipeline {
                         "$DOCKER_IMAGE"
 
                     sudo docker ps --filter "name=$DOCKER_CONTAINER"
+
+                    echo "Cleaning up unused dangling application images..."
+                    sudo docker image prune -f
                 '''
             }
         }
