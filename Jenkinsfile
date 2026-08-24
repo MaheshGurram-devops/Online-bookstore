@@ -11,7 +11,7 @@ pipeline {
                 echo 'Checkout repository using Jenkins Git credentials'
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: '*/umamahesh-V1']],
+                    branches: [[name: '*/full-pipeline']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/MaheshGurram-devops/Online-bookstore.git',
                         credentialsId: 'Github-credentials-Uma'
